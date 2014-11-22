@@ -102,6 +102,7 @@ def control(batchFilePath= '/data2/druidBatchData'):
     previousHour, nextHour = getRangeHour()
     batchJsonFile = 'ip-{0}.ec2.internaldata_{1}_{2}_druid.json'.format(localIp, previousHour, nextHour)
     batchJsonFullPath = os.path.join(batchFilePath, batchJsonFile)
+    print 'get: ', batchJsonFullPath
     integration = Integration(batchJsonFullPath)
     integration.insertMysql()
 
