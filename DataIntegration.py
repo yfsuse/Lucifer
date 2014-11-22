@@ -1,11 +1,16 @@
 #! /usr/bin/env python
 # --*-- coding:utf-8 --*--
 
+import sys
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
 __author__ = 'jeff.yu'
 
 import json
 import pymongo
 import MySQLdb
+import os
 
 
 class Integration(object):
@@ -13,6 +18,7 @@ class Integration(object):
     def __init__(self, jsonFile):
         self.jsonFile = jsonFile
         self.jsonList = []
+        self.setJsonList()
 
     def setJsonList(self):
         try:
@@ -29,7 +35,7 @@ class Integration(object):
                     offerId = jsonLine.get("offer_id")
                 conv_time = jsonLine.get("conv_time")
                 status = jsonLine.get("status")
-                url = jsonLine.get("request_url")
+                url = jsonLine.get("request_url").decode("gbk").encode("utf8")
                 tableData.append(convertConvTime(conv_time))
                 tableData.append(offerId)
                 tableData.append(status)
@@ -58,7 +64,7 @@ class Integration(object):
         for record in self.jsonList:
             sql = "insert into statustable(conv_time, offer_id, status, url) values(%s, %s, %s, %s)"
             result = cursor.execute(sql, record)
-            print result
+        conn.commit()
         conn.close()
 
 def convertConvTime(conv_time):
@@ -76,6 +82,12 @@ def findOfferFromDB(id):
             return find.get("offer")
     conn.disconnect()
 
+
+def control(batchFilePath= '/data2/druidBatchData'):
+    batchFileList = os.listdir(batchFilePath)
+    previousHouFile = os.path.json(batchFilePath, batchFileList[-2])
+    p = Integration(previousHouFile)
+    p.insertMysql()
+
 if __name__ == '__main__':
-    p = Integration(r'/data2/druidBatchData/status.json')
-    p.getJsonList()
+    control()
