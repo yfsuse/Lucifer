@@ -85,7 +85,7 @@ def findOfferFromDB(id):
 
 def control(batchFilePath= '/data2/druidBatchData'):
     batchFileList = os.listdir(batchFilePath)
-    previousHouFile = os.path.json(batchFilePath, batchFileList[-2])
+    previousHouFile = os.path.join(batchFilePath, batchFileList[-2])
     p = Integration(previousHouFile)
     p.insertMysql()
 
