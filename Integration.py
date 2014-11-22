@@ -11,6 +11,9 @@ import json
 import pymongo
 import MySQLdb
 import os
+import datetime
+import socket
+
 
 
 class Integration(object):
@@ -82,12 +85,25 @@ def findOfferFromDB(id):
             return find.get("offer")
     conn.disconnect()
 
+def getRangeHour():
+    now = datetime.datetime.now()
+    previous = now + datetime.timedelta(hours=-1)
+    return (previous.strftime('%Y-%m-%dT%H'), now.strftime('%Y-%m-%dT%H'))
+
+def getip():
+    return socket.gethostbyname(socket.gethostname()).replace('.', '-')
 
 def control(batchFilePath= '/data2/druidBatchData'):
-    batchFileList = os.listdir(batchFilePath)
-    previousHouFile = os.path.join(batchFilePath, batchFileList[-2])
-    p = Integration(previousHouFile)
-    p.insertMysql()
+    """
+    :param batchFilePath:
+    :return: ip-10-1-15-13.ec2.internaldata_2014-11-21T23_2014-11-22T00_druid.json
+    """
+    localIp = getip()
+    previousHour, nextHour = getRangeHour()
+    batchJsonFile = 'ip-{0}.ec2.internaldata_{1}_{2}_druid.json'.format(localIp, previousHour, nextHour)
+    batchJsonFullPath = os.path.join(batchFilePath, batchJsonFile)
+    integration = Integration(batchJsonFullPath)
+    integration.insertMysql()
 
 if __name__ == '__main__':
     control()
