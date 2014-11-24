@@ -54,19 +54,6 @@ class Integration(object):
 
     def insertMysql(self):
         conn = MySQLdb.connect(host="10.1.5.60", user="django", passwd="django", db="statusdb", charset="utf8")
-        """
-        <1> create database statusdb default character set gbk;
-        <2> use statusdb;
-        <3> CREATE TABLE `statustable` (
-                `statusid` int(11) NOT NULL AUTO_INCREMENT,
-                `conv_time` datetime DEFAULT NULL,
-                `offer_id` varchar(20) DEFAULT NULL,
-                `status` varchar(10) DEFAULT NULL,
-                `url` varchar(1024) DEFAULT NULL,
-                PRIMARY KEY (`statusid`)
-                ) ENGINE=InnoDB DEFAULT CHARSET=gbk
-        <4> grant select,insert,update,delete,create,drop on statusdb.* to django@'%' identified by 'django';
-        """
         cursor = conn.cursor()
         for record in self.jsonList:
             sql = "insert into statustable(conv_time, offer_id, status, url) values(%s, %s, %s, %s)"
